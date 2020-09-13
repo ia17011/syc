@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import {PackageJSON, Packages} from './@types/type'
+import ora = require('ora')
 
 /**
  * load package.json
@@ -15,8 +16,10 @@ async function loadPackageJson(packageJsonPath: string): Promise<PackageJSON> {
  * get packages from package.jsonのdependencies & devDependencies
  */
 export async function listPackages(packageJsonPath: string) {
+  const spinner = ora('Loading package.json…').start()
+
   const packageJson = await loadPackageJson(packageJsonPath)
-  let packages: Packages = new Set<string>()
+  let packageSet: Set<string> = new Set<string>()
 
   const typePackage = new RegExp('^@types/', 'g')
 
@@ -25,7 +28,7 @@ export async function listPackages(packageJsonPath: string) {
       if (typePackage.test(packageName)) {
         continue
       }
-      packages.add(packageName)
+      packageSet.add(packageName)
     }
   }
 
@@ -36,9 +39,13 @@ export async function listPackages(packageJsonPath: string) {
       if (typePackage.test(packageName)) {
         continue
       }
-      packages.add(packageName)
+      packageSet.add(packageName)
     }
   }
+
+  const packages: Packages = Array.from(packageSet)
+
+  spinner.stop()
 
   return packages
 }
