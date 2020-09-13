@@ -5,11 +5,15 @@ import ora = require('ora')
 /**
  * load package.json
  */
-async function loadPackageJson(packageJsonPath: string): Promise<PackageJSON> {
-  const packageJson: PackageJSON = JSON.parse(
-    await fs.readFileSync(packageJsonPath, 'utf8'),
-  )
-  return packageJson
+async function loadPackageJson(packageJsonPath: string) {
+  try {
+    const packageJson: PackageJSON = JSON.parse(
+      await fs.readFileSync(packageJsonPath, 'utf8'),
+    )
+    return packageJson
+  } catch (err) {
+    console.error('could not load package.json', err.message)
+  }
 }
 
 /**
@@ -18,7 +22,10 @@ async function loadPackageJson(packageJsonPath: string): Promise<PackageJSON> {
 export async function listPackages(packageJsonPath: string) {
   const spinner = ora('Loading package.json…').start()
   const packageJson = await loadPackageJson(packageJsonPath)
-  let packageSet = new Set<string>()
+  if (typeof packageJson === 'undefined') {
+    return
+  }
+  const packageSet = new Set<string>()
 
   // remove @types package
   const typePackage = new RegExp('^@types/', 'g')
