@@ -77,7 +77,8 @@ export namespace PackageJSON {
   }
 }
 
-export type Packages = Set<string>
+type Package = string
+export type Packages = Package[]
 
 /**
  * GitHub repository item
