@@ -1,19 +1,35 @@
 import {Octokit} from '@octokit/rest'
-import {RepositoryItem} from './@types/type'
+import {Packages, RepositoryItem} from './@types/type'
+import ora = require('ora')
+require('dotenv').config()
 
-const octokit = new Octokit()
+async function fetchGitHubRepositories(packages: string[]) {
+  const octokit = new Octokit()
+  let repos: RepositoryItem[] = []
 
-/**
- * get single repository that hit with query(repositoryName)
- */
-export async function searchRepository(repositoryName: string) {
-  return octokit.search
-    .repos({
-      q: `${repositoryName} in:name`,
-      order: 'desc',
-    })
-    .then((res) => {
-      return res.data.items[0] as RepositoryItem
-    })
-    .catch(() => null)
+  for (const name of packages) {
+    octokit.search
+      .repos({
+        q: `${name} in:name`,
+        order: 'desc',
+      })
+      .then((res) => {
+        repos.push(res.data.items[0] as RepositoryItem)
+      })
+  }
+
+  return repos
+}
+
+export async function getRepositoryItems(
+  packages: Packages,
+): Promise<RepositoryItem[]> {
+  const spinner = ora('Searching package repository on GitHub…').start()
+
+  let repositoryItems: RepositoryItem[] = await fetchGitHubRepositories(
+    packages,
+  )
+  spinner.stop()
+
+  return repositoryItems
 }
