@@ -24,7 +24,8 @@ $ npm install -g syc
 
 ## Usage
 
-You should change directory to same with target package.json.
+You should change directory same level with target package.json. `syc` check
+your package.json(depndencies and devDependencies) and ignore @types pakcages.
 
 ```bash
 $ cd your-node-project
