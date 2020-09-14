@@ -1,28 +1,13 @@
 import {Octokit} from '@octokit/rest'
 import {Packages, RepositoryItem} from './@types/type'
 import ora = require('ora')
+require('dotenv').config()
 
-/**
- * get single repository that hit with query(repositoryName)
- */
-// async function fetchGitHubRepository(repositoryName: string) {
-//   const octokit = new Octokit()
-//   return octokit.search
-//     .repos({
-//       q: `${repositoryName} in:name`,
-//       order: 'desc',
-//     })
-//     .then((res) => {
-//       return res.data.items[0] as RepositoryItem
-//     })
-//     .catch(() => null)
-// }
-
-async function fetchGitHubRepositories(repositoryNames: string[]) {
+async function fetchGitHubRepositories(packages: string[]) {
   const octokit = new Octokit()
   let repos: RepositoryItem[] = []
 
-  for (const name of repositoryNames) {
+  for (const name of packages) {
     octokit.search
       .repos({
         q: `${name} in:name`,
@@ -31,7 +16,6 @@ async function fetchGitHubRepositories(repositoryNames: string[]) {
       .then((res) => {
         repos.push(res.data.items[0] as RepositoryItem)
       })
-      .catch(() => null)
   }
 
   return repos
